@@ -207,16 +207,24 @@ public class AddressBook {
      */
 
     public static void main(String[] args) {
-        showWelcomeMessage();
-        processProgramArgs(args);
-        loadDataFromStorage();
+        startUpProgram(args);
         while (true) {
-            String userCommand = getUserInput();
-            echoUserCommand(userCommand);
-            String feedback = executeCommand(userCommand);
-            showResultToUser(feedback);
+            processUserInput();
         }
     }
+
+	private static void startUpProgram(String[] args) {
+		showWelcomeMessage();
+        processProgramArgs(args);
+        loadDataFromStorage();
+	}
+
+	private static void processUserInput() {
+		String userCommand = getUserInput();
+		echoUserCommand(userCommand);
+		String feedback = executeCommand(userCommand);
+		showResultToUser(feedback);
+	}
 
     /*
      * NOTE : =============================================================
@@ -257,19 +265,31 @@ public class AddressBook {
      * @param args full program arguments passed to application main method
      */
     private static void processProgramArgs(String[] args) {
-        if (args.length >= 2) {
+        if (isProgramValid(args)) {
             showToUser(MESSAGE_INVALID_PROGRAM_ARGS);
             exitProgram();
         }
 
-        if (args.length == 1) {
+        if (isGivenFile(args)) {
             setupGivenFileForStorage(args[0]);
         }
 
-        if(args.length == 0) {
+        if(isDefaultFile(args)) {
             setupDefaultFileForStorage();
         }
     }
+
+	private static boolean isDefaultFile(String[] args) {
+		return args.length == 0;
+	}
+
+	private static boolean isGivenFile(String[] args) {
+		return args.length == 1;
+	}
+
+	private static boolean isProgramValid(String[] args) {
+		return args.length >= 2;
+	}
 
     /**
      * Sets up the storage file based on the supplied file path.
@@ -312,7 +332,7 @@ public class AddressBook {
      * and a valid file name as determined by {@link #hasValidFileName}.
      */
     private static boolean isValidFilePath(String filePath) {
-        if (filePath == null) {
+        if (noValidFilePath(filePath)) {
             return false;
         }
         Path filePathToValidate;
@@ -323,6 +343,10 @@ public class AddressBook {
         }
         return hasValidParentDirectory(filePathToValidate) && hasValidFileName(filePathToValidate);
     }
+
+	private static boolean noValidFilePath(String filePath) {
+		return filePath == null;
+	}
 
     /**
      * Returns true if the file path has a parent directory that exists.
@@ -641,14 +665,18 @@ public class AddressBook {
     private static String getDisplayString(ArrayList<String[]> persons) {
         final StringBuilder messageAccumulator = new StringBuilder();
         for (int i = 0; i < persons.size(); i++) {
-            final String[] person = persons.get(i);
-            final int displayIndex = i + DISPLAYED_INDEX_OFFSET;
-            messageAccumulator.append('\t')
-                              .append(getIndexedPersonListElementMessage(displayIndex, person))
-                              .append(LS);
+            displayPerson(persons, messageAccumulator, i);
         }
         return messageAccumulator.toString();
     }
+
+	private static void displayPerson(ArrayList<String[]> persons, final StringBuilder messageAccumulator, int i) {
+		final String[] person = persons.get(i);
+		final int displayIndex = i + DISPLAYED_INDEX_OFFSET;
+		messageAccumulator.append('\t')
+		                  .append(getIndexedPersonListElementMessage(displayIndex, person))
+		                  .append(LS);
+	}
 
     /**
      * Constructs a prettified listing element message to represent a person and their data.
@@ -1150,8 +1178,8 @@ public class AddressBook {
      * @param sign  Parameter sign to be removed
      * @return  string without the sign
      */
-    private static String removePrefixSign(String s, String sign) {
-        return s.replace(sign, "");
+    private static String removePrefix(String fullstring, String prefix) {
+        return fullstring.replace(prefix, "");
     }
 
     /**
