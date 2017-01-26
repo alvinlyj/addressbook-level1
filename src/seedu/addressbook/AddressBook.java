@@ -98,40 +98,40 @@ public class AddressBook {
     private static final String PERSON_STRING_REPRESENTATION = "%1$s " // name
                                                             + PERSON_DATA_PREFIX_PHONE + "%2$s " // phone
                                                             + PERSON_DATA_PREFIX_EMAIL + "%3$s"; // email
-    private static final String COMMAND_ADD_WORD = "add";
+    private static final String ADD = "add";
     private static final String COMMAND_ADD_DESC = "Adds a person to the address book.";
     private static final String COMMAND_ADD_PARAMETERS = "NAME "
                                                       + PERSON_DATA_PREFIX_PHONE + "PHONE_NUMBER "
                                                       + PERSON_DATA_PREFIX_EMAIL + "EMAIL";
-    private static final String COMMAND_ADD_EXAMPLE = COMMAND_ADD_WORD + " John Doe p/98765432 e/johnd@gmail.com";
+    private static final String COMMAND_ADD_EXAMPLE = ADD + " John Doe p/98765432 e/johnd@gmail.com";
 
-    private static final String COMMAND_FIND_WORD = "find";
+    private static final String FIND = "find";
     private static final String COMMAND_FIND_DESC = "Finds all persons whose names contain any of the specified "
                                         + "keywords (case-sensitive) and displays them as a list with index numbers.";
     private static final String COMMAND_FIND_PARAMETERS = "KEYWORD [MORE_KEYWORDS]";
-    private static final String COMMAND_FIND_EXAMPLE = COMMAND_FIND_WORD + " alice bob charlie";
+    private static final String COMMAND_FIND_EXAMPLE = FIND + " alice bob charlie";
 
-    private static final String COMMAND_LIST_WORD = "list";
+    private static final String LIST = "list";
     private static final String COMMAND_LIST_DESC = "Displays all persons as a list with index numbers.";
-    private static final String COMMAND_LIST_EXAMPLE = COMMAND_LIST_WORD;
+    private static final String COMMAND_LIST_EXAMPLE = LIST;
 
-    private static final String COMMAND_DELETE_WORD = "delete";
+    private static final String DELETE = "delete";
     private static final String COMMAND_DELETE_DESC = "Deletes a person identified by the index number used in "
                                                     + "the last find/list call.";
     private static final String COMMAND_DELETE_PARAMETER = "INDEX";
-    private static final String COMMAND_DELETE_EXAMPLE = COMMAND_DELETE_WORD + " 1";
+    private static final String COMMAND_DELETE_EXAMPLE = DELETE + " 1";
 
-    private static final String COMMAND_CLEAR_WORD = "clear";
+    private static final String CLEAR = "clear";
     private static final String COMMAND_CLEAR_DESC = "Clears address book permanently.";
-    private static final String COMMAND_CLEAR_EXAMPLE = COMMAND_CLEAR_WORD;
+    private static final String COMMAND_CLEAR_EXAMPLE = CLEAR;
 
-    private static final String COMMAND_HELP_WORD = "help";
+    private static final String HELP = "help";
     private static final String COMMAND_HELP_DESC = "Shows program usage instructions.";
-    private static final String COMMAND_HELP_EXAMPLE = COMMAND_HELP_WORD;
+    private static final String COMMAND_HELP_EXAMPLE = HELP;
 
-    private static final String COMMAND_EXIT_WORD = "exit";
+    private static final String EXIT = "exit";
     private static final String COMMAND_EXIT_DESC = "Exits the program.";
-    private static final String COMMAND_EXIT_EXAMPLE = COMMAND_EXIT_WORD;
+    private static final String COMMAND_EXIT_EXAMPLE = EXIT;
 
     private static final String DIVIDER = "===================================================";
 
@@ -388,24 +388,27 @@ public class AddressBook {
      * @param userInputString  raw input from user
      * @return  feedback about how the command was executed
      */
+    public enum commandType {
+    	ADD, FIND, LIST, DELETE, CLEAR, HELP, EXIT
+    }
     private static String executeCommand(String userInputString) {
         final String[] commandTypeAndParams = splitCommandWordAndArgs(userInputString);
         final String commandType = commandTypeAndParams[0];
         final String commandArgs = commandTypeAndParams[1];
         switch (commandType) {
-        case COMMAND_ADD_WORD:
+        case ADD:
             return executeAddPerson(commandArgs);
-        case COMMAND_FIND_WORD:
+        case FIND:
             return executeFindPersons(commandArgs);
-        case COMMAND_LIST_WORD:
+        case LIST:
             return executeListAllPersonsInAddressBook();
-        case COMMAND_DELETE_WORD:
+        case DELETE:
             return executeDeletePerson(commandArgs);
-        case COMMAND_CLEAR_WORD:
+        case CLEAR:
             return executeClearAddressBook();
-        case COMMAND_HELP_WORD:
+        case HELP:
             return getUsageInfoForAllCommands();
-        case COMMAND_EXIT_WORD:
+        case EXIT:
             executeExitProgramRequest();
         default:
             return getMessageForInvalidCommandInput(commandType, getUsageInfoForAllCommands());
@@ -445,7 +448,7 @@ public class AddressBook {
 
         // checks if args are valid (decode result will not be present if the person is invalid)
         if (!decodeResult.isPresent()) {
-            return getMessageForInvalidCommandInput(COMMAND_ADD_WORD, getUsageInfoForAddCommand());
+            return getMessageForInvalidCommandInput(ADD, getUsageInfoForAddCommand());
         }
 
         // add the person as specified
@@ -525,7 +528,7 @@ public class AddressBook {
      */
     private static String executeDeletePerson(String commandArgs) {
         if (!isDeletePersonArgsValid(commandArgs)) {
-            return getMessageForInvalidCommandInput(COMMAND_DELETE_WORD, getUsageInfoForDeleteCommand());
+            return getMessageForInvalidCommandInput(DELETE, getUsageInfoForDeleteCommand());
         }
         final int targetVisibleIndex = extractTargetIndexFromDeletePersonArgs(commandArgs);
         if (!isDisplayIndexValidForLastPersonListingView(targetVisibleIndex)) {
@@ -1017,12 +1020,12 @@ public class AddressBook {
 
         // phone is last arg, target is from prefix to end of string
         if (indexOfPhonePrefix > indexOfEmailPrefix) {
-            return removePrefixSign(encoded.substring(indexOfPhonePrefix, encoded.length()).trim(),
+            return removePrefix(encoded.substring(indexOfPhonePrefix, encoded.length()).trim(),
                     PERSON_DATA_PREFIX_PHONE);
 
         // phone is middle arg, target is from own prefix to next prefix
         } else {
-            return removePrefixSign(
+            return removePrefix(
                     encoded.substring(indexOfPhonePrefix, indexOfEmailPrefix).trim(),
                     PERSON_DATA_PREFIX_PHONE);
         }
@@ -1040,12 +1043,12 @@ public class AddressBook {
 
         // email is last arg, target is from prefix to end of string
         if (indexOfEmailPrefix > indexOfPhonePrefix) {
-            return removePrefixSign(encoded.substring(indexOfEmailPrefix, encoded.length()).trim(),
+            return removePrefix(encoded.substring(indexOfEmailPrefix, encoded.length()).trim(),
                     PERSON_DATA_PREFIX_EMAIL);
 
         // email is middle arg, target is from own prefix to next prefix
         } else {
-            return removePrefixSign(
+            return removePrefix(
                     encoded.substring(indexOfEmailPrefix, indexOfPhonePrefix).trim(),
                     PERSON_DATA_PREFIX_EMAIL);
         }
@@ -1121,46 +1124,46 @@ public class AddressBook {
 
     /** Returns the string for showing 'add' command usage instruction */
     private static String getUsageInfoForAddCommand() {
-        return String.format(MESSAGE_COMMAND_HELP, COMMAND_ADD_WORD, COMMAND_ADD_DESC) + LS
+        return String.format(MESSAGE_COMMAND_HELP, ADD, COMMAND_ADD_DESC) + LS
                 + String.format(MESSAGE_COMMAND_HELP_PARAMETERS, COMMAND_ADD_PARAMETERS) + LS
                 + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_ADD_EXAMPLE) + LS;
     }
 
     /** Returns the string for showing 'find' command usage instruction */
     private static String getUsageInfoForFindCommand() {
-        return String.format(MESSAGE_COMMAND_HELP, COMMAND_FIND_WORD, COMMAND_FIND_DESC) + LS
+        return String.format(MESSAGE_COMMAND_HELP, FIND, COMMAND_FIND_DESC) + LS
                 + String.format(MESSAGE_COMMAND_HELP_PARAMETERS, COMMAND_FIND_PARAMETERS) + LS
                 + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_FIND_EXAMPLE) + LS;
     }
 
     /** Returns the string for showing 'delete' command usage instruction */
     private static String getUsageInfoForDeleteCommand() {
-        return String.format(MESSAGE_COMMAND_HELP, COMMAND_DELETE_WORD, COMMAND_DELETE_DESC) + LS
+        return String.format(MESSAGE_COMMAND_HELP, DELETE, COMMAND_DELETE_DESC) + LS
                 + String.format(MESSAGE_COMMAND_HELP_PARAMETERS, COMMAND_DELETE_PARAMETER) + LS
                 + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_DELETE_EXAMPLE) + LS;
     }
 
     /** Returns string for showing 'clear' command usage instruction */
     private static String getUsageInfoForClearCommand() {
-        return String.format(MESSAGE_COMMAND_HELP, COMMAND_CLEAR_WORD, COMMAND_CLEAR_DESC) + LS
+        return String.format(MESSAGE_COMMAND_HELP, CLEAR, COMMAND_CLEAR_DESC) + LS
                 + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_CLEAR_EXAMPLE) + LS;
     }
 
     /** Returns the string for showing 'view' command usage instruction */
     private static String getUsageInfoForViewCommand() {
-        return String.format(MESSAGE_COMMAND_HELP, COMMAND_LIST_WORD, COMMAND_LIST_DESC) + LS
+        return String.format(MESSAGE_COMMAND_HELP, LIST, COMMAND_LIST_DESC) + LS
                 + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_LIST_EXAMPLE) + LS;
     }
 
     /** Returns string for showing 'help' command usage instruction */
     private static String getUsageInfoForHelpCommand() {
-        return String.format(MESSAGE_COMMAND_HELP, COMMAND_HELP_WORD, COMMAND_HELP_DESC)
+        return String.format(MESSAGE_COMMAND_HELP, HELP, COMMAND_HELP_DESC)
                 + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_HELP_EXAMPLE);
     }
 
     /** Returns the string for showing 'exit' command usage instruction */
     private static String getUsageInfoForExitCommand() {
-        return String.format(MESSAGE_COMMAND_HELP, COMMAND_EXIT_WORD, COMMAND_EXIT_DESC)
+        return String.format(MESSAGE_COMMAND_HELP, EXIT, COMMAND_EXIT_DESC)
                 + String.format(MESSAGE_COMMAND_HELP_EXAMPLE, COMMAND_EXIT_EXAMPLE);
     }
 
