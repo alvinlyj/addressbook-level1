@@ -221,7 +221,6 @@ public class AddressBook {
 
 	private static void processUserInput() {
 		String userCommand = getUserInput();
-		echoUserCommand(userCommand);
 		String feedback = executeCommand(userCommand);
 		showResultToUser(feedback);
 	}
@@ -632,6 +631,7 @@ public class AddressBook {
         while (inputLine.trim().isEmpty() || inputLine.trim().charAt(0) == INPUT_COMMENT_MARKER) {
             inputLine = SCANNER.nextLine();
         }
+		echoUserCommand(inputLine);
         return inputLine;
     }
 
